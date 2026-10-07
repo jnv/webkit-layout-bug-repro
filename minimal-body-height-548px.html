@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<title>Fixed descendant of a z-indexed element is clipped to body's box when html and body have overflow:hidden</title>
+<style>
+  html, body { margin: 0; overflow: hidden; }
+  body { height: 548px; }
+  #wrapper { position: relative; z-index: 2; }
+  #banner { position: fixed; left: 0; right: 0; bottom: 0; height: 200px; background: red; }
+  #cover { position: fixed; inset: 0; z-index: 1; background: white; }
+</style>
+<!--
+  Expected: the red #banner paints over the white #cover. Its stacking context (#wrapper, z-index 2) is above #cover (z-index 1).
+  Actual (Safari 27): the page is all white, but clicking the bottom of the page hits #banner. Hiding #cover reveals the banner.
+  #banner is clipped to body's box (0px tall here): with body { height: 548px; } in a 648px viewport, only the top half of the banner paints.
+  The bug goes away if `overflow: hidden` is removed from either html or body, or if #cover is position: absolute.
+-->
+<div id="wrapper"><div id="banner" onclick="this.style.background = 'green'"></div></div>
+<div id="cover"></div>
